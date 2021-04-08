@@ -28,7 +28,7 @@ export default function Scan() {
     }
   
     return (
-      <View style={styles.container}>
+      <View>
         <BarCodeScanner
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}

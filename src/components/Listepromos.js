@@ -3,13 +3,14 @@ import { Text, View, StyleSheet, FlatList,TouchableOpacity, ActivityIndicator, I
 import { PureComponent } from 'react';
 
 export default class Listepromos extends PureComponent {
+  
   state = {
       data: [],
       loading: true
   }
   async componentDidMount() {
     try {
-      const api = await fetch('http://localhost:1348/promos');
+      const api = await fetch('https://mspr-epsi.tomco.tech/promos');
       const dataJson = await api.json();
       this.setState({data: dataJson, loading: false});
 
@@ -36,12 +37,13 @@ export default class Listepromos extends PureComponent {
     } else {
         return <ActivityIndicator />
     }
+  }
 }
 
-}
 const styles = StyleSheet.create({
   listItemContainer: {
-      border: '1px solid rgba(255, 0, 0, .5)',
+      borderWidth: 1,
+      borderColor: "#ff0000",
       borderRadius: 15,
       flexDirection: 'row',
       justifyContent: 'space-between',
