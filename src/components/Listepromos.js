@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, FlatList,TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { Text, View, StyleSheet, FlatList,TouchableOpacity, ActivityIndicator, Image, StatusBar, SafeAreaView } from 'react-native';
 import { PureComponent } from 'react';
 
 export default class Listepromos extends PureComponent {
@@ -10,7 +10,7 @@ export default class Listepromos extends PureComponent {
   }
   async componentDidMount() {
     try {
-      const api = await fetch('https://mspr-epsi.tomco.tech/promos');
+      const api = await fetch('http://mspr-epsi.tomco.tech/promos');
       const dataJson = await api.json();
       this.setState({data: dataJson, loading: false});
 
@@ -29,11 +29,15 @@ export default class Listepromos extends PureComponent {
   render() {
     const { data, loading } = this.state;
     if(!loading) {
-        return <FlatList 
-                data={data}
-                renderItem={this.renderItem}
-                keyExtractor={(item) => item.name} 
-                />
+        return (
+          <SafeAreaView style={styles.container}>
+            <FlatList 
+              data={data}
+              renderItem={this.renderItem}
+              keyExtractor={(item) => item.id} 
+            />
+          </SafeAreaView>
+        );
     } else {
         return <ActivityIndicator />
     }
@@ -41,6 +45,10 @@ export default class Listepromos extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
   listItemContainer: {
       borderWidth: 1,
       borderColor: "#ff0000",
