@@ -34,7 +34,7 @@ export default class Listepromos extends PureComponent {
             <FlatList 
               data={data}
               renderItem={this.renderItem}
-              keyExtractor={(item) => item.id} 
+              keyExtractor={(item) => item.ID.toString()} 
             />
           </SafeAreaView>
         );
