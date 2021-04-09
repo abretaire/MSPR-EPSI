@@ -1,13 +1,18 @@
-import * as React from 'react';
-import { Text, View, StyleSheet, FlatList,TouchableOpacity, ActivityIndicator, Image, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState } from "react";
+import { Text, View, StyleSheet, FlatList,TouchableOpacity, ActivityIndicator, Image, StatusBar, SafeAreaView, Modal, Pressable } from 'react-native';
 import { PureComponent } from 'react';
 
 export default class Listepromos extends PureComponent {
-  
   state = {
       data: [],
-      loading: true
+      loading: true,
+      modalVisible: false
   }
+
+  setModalVisible = (visible) => {
+    this.setState({ modalVisible: visible });
+  }
+
   async componentDidMount() {
     try {
       const api = await fetch('http://mspr-epsi.tomco.tech/promos');
@@ -19,8 +24,8 @@ export default class Listepromos extends PureComponent {
     }
   }
   renderItem(data) {
-      return <TouchableOpacity>
-                  <View  style={styles.listItemContainer}>
+      return <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+                  <View style={styles.listItemContainer}>
                       <Text style={styles.itemHeader}>{data.item.LIBELLE}</Text>
                       <Text style={styles.itemLabelle}>Code : {data.item.DATA} d'un montant de {data.item.MONTANT}€</Text>
                   </View>
@@ -28,14 +33,34 @@ export default class Listepromos extends PureComponent {
   }
   render() {
     const { data, loading } = this.state;
+    const { modalVisible } = this.state;
     if(!loading) {
         return (
           <SafeAreaView style={styles.container}>
+            <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => { Alert.alert("Modal has been closed."); setModalVisible(!modalVisible); }} >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.modalText}>Hello World!</Text>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => this.setModalVisible(!modalVisible)}>
+                    <Text style={styles.textStyle}>Fermer</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Modal>
             <FlatList 
-              data={data}
-              renderItem={this.renderItem}
-              keyExtractor={(item) => item.ID.toString()} 
-            />
+              data={data} 
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+                    <View style={styles.listItemContainer}>
+                        <Text style={styles.itemHeader}>{item.LIBELLE}</Text>
+                        <Text style={styles.itemLabelle}>Code : {item.DATA} d'un montant de {item.MONTANT}€</Text>
+                    </View>
+                </TouchableOpacity>
+              )}     
+              keyExtractor={(item) => item.ID.toString()}>
+            </FlatList>
           </SafeAreaView>
         );
     } else {
@@ -44,10 +69,50 @@ export default class Listepromos extends PureComponent {
   }
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: StatusBar.currentHeight || 0,
+  },
+  // Modal
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    margin: 0,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    width: 300,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   },
   listItemContainer: {
       borderWidth: 1,
