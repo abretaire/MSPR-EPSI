@@ -9,8 +9,13 @@ export default class Listepromos extends PureComponent {
       modalVisible: false
   }
 
-  setModalVisible = (visible) => {
-    this.setState({ modalVisible: visible });
+  setModalVisible = (visible, libelle, montant, code) => {
+    this.setState({ 
+      modalVisible: visible, 
+      libelle: libelle,
+      montant: montant,
+      code: code
+    });
   }
 
   async componentDidMount() {
@@ -40,7 +45,9 @@ export default class Listepromos extends PureComponent {
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => { Alert.alert("Modal has been closed."); setModalVisible(!modalVisible); }} >
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                  <Text style={styles.modalText}>Hello World!</Text>
+                  <Text style={styles.modalText}>Enseigne : {this.state.libelle}</Text>
+                  <Text style={styles.modalText}>Valeur : {this.state.montant}€</Text>
+                  <Text style={styles.modalText}>Code : {this.state.code}</Text>
                   <Pressable
                     style={[styles.button, styles.buttonClose]}
                     onPress={() => this.setModalVisible(!modalVisible)}>
@@ -52,7 +59,7 @@ export default class Listepromos extends PureComponent {
             <FlatList 
               data={data} 
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+                <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible, item.LIBELLE, item.MONTANT, item.DATA)}>
                     <View style={styles.listItemContainer}>
                         <Text style={styles.itemHeader}>{item.LIBELLE}</Text>
                         <Text style={styles.itemLabelle}>Code : {item.DATA} d'un montant de {item.MONTANT}€</Text>
