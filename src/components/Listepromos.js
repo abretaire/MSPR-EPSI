@@ -20,7 +20,7 @@ export default class Listepromos extends PureComponent {
 
   async componentDidMount() {
     try {
-      const api = await fetch('http://mspr-epsi.tomco.tech/promos');
+      const api = await fetch('http://mspr-epsi.tomco.tech/promos/');
       const dataJson = await api.json();
       this.setState({data: dataJson, loading: false});
 

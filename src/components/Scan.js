@@ -1,39 +1,102 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, Button, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
-export default function Scan() {
+export default function Scan()
+  {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
+    const [text, setText] = useState('Aucun code n\'a été scanné.')
   
-    useEffect(() => {
+    const askForCameraPermission = () => {
       (async () => {
         const { status } = await BarCodeScanner.requestPermissionsAsync();
         setHasPermission(status === 'granted');
-      })();
+      })()
+    }
+  
+    // Request Camera Permission
+    useEffect(() => {
+      askForCameraPermission();
     }, []);
   
-    const handleBarCodeScanned = ({ type, data }) => {
-      // condition si exsite en base de données 
+    // What happens when we scan the bar code
+    const handleBarCodeScanned = async ({ data }) => {
       setScanned(true);
-      alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        try {
+          const api = await fetch('http://mspr-epsi.tomco.tech/promos/' + data);
+          const dataJson = await api.json();
+          setText("Marque : " + dataJson[0].LIBELLE + "\nCode : " + dataJson[0].DATA + "\nMontant : " + dataJson[0].MONTANT + "€")
+        } catch(err) {
+          setText("Le code n'a pas été trouvé");
+        }
     };
   
+    // Check permissions and return the screens
     if (hasPermission === null) {
-      return <Text>Requesting for camera permission</Text>;
+      return (
+        <View style={styles.container}>
+          <Text>Requesting for camera permission</Text>
+        </View>)
     }
     if (hasPermission === false) {
-      return <Text>No access to camera</Text>;
+      return (
+        <View style={styles.container}>
+          <Text style={{ margin: 10 }}>No access to camera</Text>
+          <Button title={'Allow Camera'} onPress={() => askForCameraPermission()} />
+        </View>)
     }
   
+    // Return the View
     return (
-      <View>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-        {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+      <View style={styles.container}>
+        <View style={styles.barcodebox}>
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={{ height: 400, width: 400 }} />
+        </View>
+        <Text style={styles.maintext}>{text}</Text>
+        {scanned && 
+          <Pressable onPress={() => setScanned(false)} style={[styles.button, styles.buttonClose]}>
+            <Text style={styles.textStyle}>Scanner à nouveau ?</Text>
+          </Pressable>
+        }
       </View>
     );
-}
+  }
+  
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    maintext: {
+      fontSize: 16,
+      margin: 20,
+    },
+    barcodebox: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 300,
+      width: 300,
+      overflow: 'hidden',
+      borderRadius: 30,
+      backgroundColor: 'tomato'
+    },
+    button: {
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2
+    },
+    buttonClose: {
+      backgroundColor: "#2196F3",
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+  });

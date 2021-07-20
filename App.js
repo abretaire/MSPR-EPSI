@@ -19,8 +19,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator>
-        <Tab.Screen name="Scan" component = { Scan } />
         <Tab.Screen name="Liste promos" component = { ListePromo } />
+        <Tab.Screen name="Scan" component = { Scan } />
       </Tab.Navigator>
     </NavigationContainer>
   );
